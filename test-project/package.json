@@ -1,0 +1,13 @@
+{
+  "name": "my-cool-discord-server",
+  "version": "1.0.0",
+  "description": "My very cool discord server!",
+  "main": "structure.js",
+  "repository": "https://github.com/LarsBaertschi/discord-as-code.git",
+  "author": "Lars Bärtschi <lars.baertschi@bluewin.ch>",
+  "license": "MIT",
+  "scripts": {
+    "apply": "discord-as-code apply",
+    "invite": "discord-as-code invite"
+  }
+}

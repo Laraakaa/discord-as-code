@@ -1,0 +1,19 @@
+{
+  "name": "discord-as-code",
+  "version": "1.0.0",
+  "description": "Manage your discord server as git repository",
+  "main": "index.js",
+  "repository": "https://github.com/LarsBaertschi/discord-as-code.git",
+  "contributors": [
+    "Lars Bärtschi",
+    "Yvo Hofer"
+  ],
+  "license": "MIT",
+  "bin": {
+    "discord-as-code": "index.js"
+  },
+  "dependencies": {
+    "crypto-js": "^4.0.0",
+    "discord.js": "^12.2.0"
+  }
+}
