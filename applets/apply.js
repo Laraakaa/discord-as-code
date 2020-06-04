@@ -46,7 +46,19 @@ module.exports = async (context) => {
     },
   }));
 
-  console.log(guild.channels);
+  guild.channels.cache.forEach((channel) => {
+    if (structure.channels.find((o) => o.name === channel.name) === undefined) {
+      channel.delete();
+    }
+  });
+
+  structure.channels.forEach((channel) => {
+    if (
+      guild.channels.cache.find((o) => o.name === channel.name) === undefined
+    ) {
+      guild.channels.create(channel.name, [channel.type]);
+    }
+  });
 
   for (let i = 0; i < actions.length; i++) {
     const action = actions[i];

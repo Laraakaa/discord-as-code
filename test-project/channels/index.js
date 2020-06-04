@@ -1,1 +1,1 @@
-module.exports = [...require('channels/discussion.js')];
+module.exports = [...require('./discussion.js')];
