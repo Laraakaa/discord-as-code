@@ -99,9 +99,10 @@ module.exports = async (context) => {
       ]);
       mapping[channel.id || channel.name] = discordChannel.id;
     }
-    await discordChannel.setTopic(channel.topic);
+    await discordChannel.setName(channel.name);
     await discordChannel.setPosition(channel.position);
     await discordChannel.setNSFW(channel.nsfw);
+    await discordChannel.setTopic(channel.topic);
   }
   const mappingString = JSON.stringify(mapping, null, 2);
   fs.writeFileSync('mapping.json', mappingString);
