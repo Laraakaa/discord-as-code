@@ -46,18 +46,68 @@ module.exports = async (context) => {
     },
   }));
 
-  guild.channels.cache.forEach((channel) => {
-    if (structure.channels.find((o) => o.name === channel.name) === undefined) {
-      channel.delete();
-    }
+  if (!fs.existsSync('mapping.json')) {
+    const mapping = structure.channels
+      .map((channel) => channel.id || channel.name)
+      .reduce((result, item) => {
+        result[item] = '';
+        return result;
+      }, {});
+    const mappingString = JSON.stringify(mapping, null, 2);
+    fs.writeFileSync('mapping.json', mappingString);
+    console.log(
+      'Mapping file has been created, please adapt it to fit your needs.'
+    );
+    return;
+  }
+
+  const mapping = JSON.parse(fs.readFileSync('mapping.json'));
+  Object.keys(mapping).forEach((key) => {
+    structure.channels = structure.channels.map((channel) => {
+      if ((channel.id || channel.name) === key) {
+        return {
+          ...channel,
+          discordId: mapping[key],
+        };
+      }
+      return channel;
+    });
   });
 
   structure.channels.forEach((channel) => {
-    if (
-      guild.channels.cache.find((o) => o.name === channel.name) === undefined
-    ) {
-      guild.channels.create(channel.name, [channel.type]);
+    if (!('discordId' in channel)) {
+      console.log(
+        `WARNING: Channel "${
+          channel.id || channel.name
+        }" was not configured in mapping file. Continuing, this channel will be viewed as non-existent.`
+      );
+      channel.discordId = '';
     }
+  });
+
+  let touchedChannels = guild.channels.cache.map((channel) => channel.id);
+
+  for (let i = 0; i < structure.channels.length; i++) {
+    const channel = structure.channels[i];
+    touchedChannels = touchedChannels.filter((c) => c !== channel.discordId);
+    let discordChannel = guild.channels.resolve(channel.discordId);
+    if (discordChannel) {
+      console.log(`Channel "${channel.id || channel.name}" found.`);
+    } else {
+      discordChannel = await guild.channels.create(channel.name, [
+        channel.type,
+      ]);
+      mapping[channel.id || channel.name] = discordChannel.id;
+    }
+    await discordChannel.setTopic(channel.topic);
+    await discordChannel.setPosition(channel.position);
+    await discordChannel.setNSFW(channel.nsfw);
+  }
+  const mappingString = JSON.stringify(mapping, null, 2);
+  fs.writeFileSync('mapping.json', mappingString);
+
+  touchedChannels.forEach((channel) => {
+    guild.channels.resolve(channel).delete();
   });
 
   for (let i = 0; i < actions.length; i++) {
